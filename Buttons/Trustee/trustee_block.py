@@ -2,7 +2,7 @@ import logging, config
 from datetime import datetime
 from aiogram import Bot, Router
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
-from db import get_user
+from db import get_user, user_in_ban_list
 
 bot = Bot(token=config.API_TOKEN)
 router = Router()
@@ -14,18 +14,21 @@ async def trustee(call: CallbackQuery):
     await bot.send_message(chat_id=config.LOGS, text=log_message)
     
     user = get_user(call.from_user.id)
+    user_ban = user_in_ban_list(call.from_user.id)
 
     if user:
-
-        video = FSInputFile(path='E:/Програмування/Telegram/MonoE/Buttons/Trustee/video/Trustee.MP4', filename='trustee.mp4')
-        caption = '<b>⚡️ Нарешті. Українцям дозволили розраховуватись криптовалютою через Google Pay/Apple Pay</b>\n\nМожливості карти від Trustee:\n\n▪️Купівля крипти і виведення одразу на звичайну карту.\n▪️Зняття крипти в банкоматі.\n▪️5000€ денний ліміт (включаючи витрати за кордоном).\n▪️Верифікація через «Дію».\n▪️Відсутність фінмоніторингу.\n\n▪️Картою через Google Pay/Apple Pay можливо розраховуватися як в Україні, так і за кордоном. \n\n<i>Посилання на додаток: https://trusteeglobal.com/?refferals=8jBMqvCfUBbx</i>\n\n<b>Користуйтесь, це швидко, безпечно та зручно 😉</b>'
-    
-        markup = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='⬇️ Завантажити додаток', url='https://trusteeglobal.com/?refferals=8jBMqvCfUBb')],[InlineKeyboardButton(text='↩️ Меню', callback_data='menu_trustee')]])
+        if not user_ban:
+            video = FSInputFile(path='E:/Програмування/Telegram/MonoE/Buttons/Trustee/video/Trustee.MP4', filename='trustee.mp4')
+            caption = '<b>⚡️ Нарешті. Українцям дозволили розраховуватись криптовалютою через Google Pay/Apple Pay</b>\n\nМожливості карти від Trustee:\n\n▪️Купівля крипти і виведення одразу на звичайну карту.\n▪️Зняття крипти в банкоматі.\n▪️5000€ денний ліміт (включаючи витрати за кордоном).\n▪️Верифікація через «Дію».\n▪️Відсутність фінмоніторингу.\n\n▪️Картою через Google Pay/Apple Pay можливо розраховуватися як в Україні, так і за кордоном. \n\n<i>Посилання на додаток: https://trusteeglobal.com/?refferals=8jBMqvCfUBbx</i>\n\n<b>Користуйтесь, це швидко, безпечно та зручно 😉</b>'
         
-        await bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
-        await bot.send_video(chat_id=call.message.chat.id, video=video, caption=caption, parse_mode='html', reply_markup=markup)
+            markup = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='⬇️ Завантажити додаток', url='https://trusteeglobal.com/?refferals=8jBMqvCfUBb')],[InlineKeyboardButton(text='↩️ Меню', callback_data='menu_trustee')]])
+            
+            await bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
+            await bot.send_video(chat_id=call.message.chat.id, video=video, caption=caption, parse_mode='html', reply_markup=markup)
+        else:
+            await call.answer(config.BAN_MESSAGE, show_alert=True)
     else:
-        await call.message.answer(config.BAN_MESSAGE)
+        await call.answer(config.BAN_MESSAGE, show_alert=True)
 
 @router.callback_query(lambda c: c.data == 'menu_trustee')
 async def menu_trustee(call: CallbackQuery):

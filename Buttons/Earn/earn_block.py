@@ -31,7 +31,7 @@ async def earn(call: CallbackQuery):
             menu = InlineKeyboardButton(text="↩️ Меню", callback_data='menu')
 
             markup = InlineKeyboardMarkup(inline_keyboard=[[menu]])
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=earn_text, parse_mode='html', reply_markup=markup)
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=earn_text, parse_mode='html', disable_web_page_preview=True, reply_markup=markup)
         else:
             await call.answer(config.BAN_MESSAGE, show_alert=True)
     else:

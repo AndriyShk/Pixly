@@ -82,7 +82,7 @@ async def send_custom_star(call: CallbackQuery, state: FSMContext):
     sent_message = await bot.edit_message_text(
         chat_id=call.message.chat.id,
         message_id=call.message.message_id,
-        text='👇 Будь ласка, введіть власну суму:',
+        text='👇 Будь ласка, введіть власну суму:\n\n⭐️Максимум: 5000 зірок',
         reply_markup=builder.as_markup())
     
     await state.update_data(message_id=sent_message.message_id, call=call)
@@ -113,7 +113,7 @@ async def card(message: types.Message, state: FSMContext):
 
         new_message = await bot.send_message(
             chat_id=message.chat.id,
-            text="<b>⛔ Помилка введення!</b> Будь ласка, введіть ціле число!",
+            text="<b>⛔ Помилка введення!</b> Будь ласка, введіть ціле число не більше 5000!",
             parse_mode='html',
             reply_markup=builder.as_markup())
         

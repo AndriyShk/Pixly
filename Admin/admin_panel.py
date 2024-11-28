@@ -142,9 +142,7 @@ async def referrals_user(call: types.CallbackQuery, state: FSMContext):
             text="❗️ Користувач не знайдений.",
             parse_mode='html',
             reply_markup=InlineKeyboardMarkup(
-                inline_keyboard=[[InlineKeyboardButton(text='↩️ Назад', callback_data='admin_menu')]]
-            )
-        )
+            inline_keyboard=[[InlineKeyboardButton(text='↩️ Назад', callback_data='back_to_user_info')]]))
         return
 
     connection = sqlite3.connect(config.DB)
@@ -158,17 +156,12 @@ async def referrals_user(call: types.CallbackQuery, state: FSMContext):
             text="<b>👫 У користувача немає рефералів.</b>",
             parse_mode="html",
             reply_markup=InlineKeyboardMarkup(
-                inline_keyboard=[[InlineKeyboardButton(text="↩️ Назад", callback_data="admin_menu")]]
-            )
-        )
+            inline_keyboard=[[InlineKeyboardButton(text="↩️ Назад", callback_data="back_to_user_info")]]))
         connection.close()
         return
 
     await state.update_data(referral_ids=referral_ids, current_page=0)
-
-    # Зберігаємо message_id в state для редагування
     await state.update_data(message_id=call.message.message_id)
-
     await display_referrals_page(call.message, referral_ids, cursor, 0, state)
 
     connection.close()
@@ -206,7 +199,7 @@ async def display_referrals_page(message, referral_ids, cursor, page, state):
         buttons.append(InlineKeyboardButton(text="⬅️", callback_data=f"referrals_page:{page-1}"))
     if end_index < len(referral_ids):
         buttons.append(InlineKeyboardButton(text="➡️", callback_data=f"referrals_page:{page+1}"))
-    buttons.append(InlineKeyboardButton(text="↩️ Назад", callback_data="admin_menu"))
+    buttons.append(InlineKeyboardButton(text="↩️ Назад", callback_data="back_to_user_info"))
 
     markup = InlineKeyboardMarkup(inline_keyboard=[buttons])
 
@@ -304,10 +297,7 @@ async def orders_user(call: types.CallbackQuery, state: FSMContext):
     else:
         text += '❌ Відхилених ордерів немає.\n\n'
 
-    # Кнопка повернення до інформації про користувача
-    markup = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text='↩️ Назад', callback_data='back_to_user_info')]
-    ])
+    markup = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='↩️ Назад', callback_data='back_to_user_info')]])
     
     await call.message.edit_text(text=text, parse_mode='html', reply_markup=markup)
 
@@ -397,7 +387,7 @@ async def display_banned_users(call: types.CallbackQuery, page: int):
             text="❗️ Заблокованих користувачів немає.",
             parse_mode='html',
             reply_markup=InlineKeyboardMarkup(
-            inline_keyboard=[[InlineKeyboardButton(text='↩️ Назад', callback_data='admin_menu')]]))
+            inline_keyboard=[[InlineKeyboardButton(text='↩️ Назад', callback_data='stata')]]))
         return
 
     if page < 1 or page > total_users:
@@ -424,7 +414,7 @@ async def display_banned_users(call: types.CallbackQuery, page: int):
     if page < total_users:
         navigation_buttons.append(InlineKeyboardButton(text="▶️", callback_data=f"blocked_users:{page+1}"))
 
-    back_button = [InlineKeyboardButton(text='↩️ Назад', callback_data='admin_menu')]
+    back_button = [InlineKeyboardButton(text='↩️ Назад', callback_data='stata')]
 
     markup = InlineKeyboardMarkup(inline_keyboard=[navigation_buttons, back_button])
 
@@ -463,7 +453,7 @@ async def display_premium_users(call: types.CallbackQuery, page: int):
             text="❗️ Преміум користувачів немає.",
             parse_mode='html',
             reply_markup=InlineKeyboardMarkup(
-            inline_keyboard=[[InlineKeyboardButton(text='↩️ Назад', callback_data='admin_menu')]]))
+            inline_keyboard=[[InlineKeyboardButton(text='↩️ Назад', callback_data='stata')]]))
         return
 
     if page < 1 or page > total_users:
@@ -494,7 +484,7 @@ async def display_premium_users(call: types.CallbackQuery, page: int):
     if page < total_users:
         navigation_buttons.append(InlineKeyboardButton(text="▶️", callback_data=f"premium_users:{page+1}"))
 
-    back_button = [InlineKeyboardButton(text='↩️ Назад', callback_data='admin_menu')]
+    back_button = [InlineKeyboardButton(text='↩️ Назад', callback_data='stata')]
     markup = InlineKeyboardMarkup(inline_keyboard=[navigation_buttons, back_button])
 
     await call.message.edit_text(
