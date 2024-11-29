@@ -16,6 +16,7 @@ class Config(StatesGroup):
     change_channels_to_subscribe = State()
     change_minimum_withdraw = State()
     change_bonus = State()
+    faq = State()
 
 def load_config():
     importlib.reload(config)
@@ -33,6 +34,8 @@ def save_config():
                 f.write(f"REWARD = {config.REWARD}\n")
             elif line.startswith("MINIMUM_WITHDRAW"):
                 f.write(f"MINIMUM_WITHDRAW = {config.MINIMUM_WITHDRAW}\n")
+            elif line.startswith("FAQ"):
+                f.write(f"FAQ = {config.FAQ}\n")
             else:
                 f.write(line)
 
@@ -46,6 +49,7 @@ async def admin_panel(message: types.Message):
     buttons = [[InlineKeyboardButton(text="🔍 Пошук користувача", callback_data="search_user")],
                [InlineKeyboardButton(text="📊 Статистика", callback_data="stata")],
                [InlineKeyboardButton(text="⚙️ Конфіг", callback_data="config")],
+               [InlineKeyboardButton(text="❓ FAQ", callback_data="new_faq")],
                [InlineKeyboardButton(text="❌ Скасувати", callback_data='cancel')]]
     
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
@@ -59,6 +63,7 @@ async def admin_menu(call: types.CallbackQuery):
     buttons = [[InlineKeyboardButton(text="🔍 Пошук користувача", callback_data="search_user")],
                [InlineKeyboardButton(text="📊 Статистика", callback_data="stata")],
                [InlineKeyboardButton(text="⚙️ Конфіг", callback_data="config")],
+               [InlineKeyboardButton(text="❓ FAQ", callback_data="new_faq")],
                [InlineKeyboardButton(text="❌ Скасувати", callback_data='cancel')]]
     
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons, row_width=2)
@@ -686,7 +691,47 @@ async def bonus(message: types.Message, state: FSMContext):
         reply_markup=markup)
     await state.clear()
 
+@router.callback_query(lambda call: call.data == "new_faq")
+async def new_faq(call: types.CallbackQuery, state: FSMContext):
+    load_config()
 
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='↩️ Назад', callback_data='admin_menu')]])
+    sent_message = await bot.edit_message_text(text="❓ Введіть новий FAQ:", message_id=call.message.message_id, chat_id=call.message.chat.id, parse_mode='html', reply_markup=keyboard)
+    
+    await state.update_data(message_id=sent_message.message_id)
+    await state.set_state(Config.faq.state)
+
+@router.message(StateFilter(Config.faq))
+async def faq(message: types.Message, state: FSMContext):
+    load_config()
+    faq = message.text
+
+    data = await state.get_data()
+    sent_message_id = data.get('message_id')
+
+    if sent_message_id:
+        try:
+            await bot.delete_message(chat_id=message.chat.id, message_id=sent_message_id)
+        except Exception as e:
+            logging.error(f"Помилка при видаленні попереднього повідомлення: {e}")
+
+    try:
+        await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+    except Exception as e:
+        logging.error(f"Помилка при видаленні поточного повідомлення: {e}")
+
+    config.FAQ = f'"{faq}"'
+    save_config()
+
+
+    menu_button = InlineKeyboardButton(text="↩️ Меню", callback_data='admin_menu')
+    markup = InlineKeyboardMarkup(inline_keyboard=[[menu_button]])
+    await bot.send_message(
+        chat_id=message.chat.id,
+        text=f'❓ FAQ було змінено на: <b>{faq}</b>',
+        parse_mode='html',
+        reply_markup=markup)
+    await state.clear()
 
 @router.message(lambda message: message.from_user.id in config.ADMIN_ID)
 async def handle_admin_message(message: types.Message):

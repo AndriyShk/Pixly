@@ -1,4 +1,4 @@
-API_TOKEN = '7783728133:AAHnlBUdhWKbZrSo-kSmnJzqlZJFu4aqfO4'
+API_TOKEN = '7275675881:AAEyx0eRCOS1JCcxeRUUyaftA50Ugxxe0Hs'
 
 ADMIN_ID = [2133124028]
 
@@ -24,4 +24,6 @@ CHAT_WITHDRAW = -1002326883833
 
 CHAT_USER_LOGS = -1002237269623
 
-BAN_MESSAGE = '⛔ Вас заблоковано!\n\n⚙️ Зверність в Тех. Підтримку'
+BAN_MESSAGE = '⛔ Вас заблоковано!\n\n⚙️ Зверніться в Тех. Підтримку'
+
+FAQ = '1. <b>Чому довго немає оплати?</b>\nВиплати проходять кожного дня з 10:00 до 23:00 в порядку черги!'

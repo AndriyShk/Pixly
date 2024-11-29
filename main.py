@@ -61,8 +61,8 @@ async def start(message: types.Message, state: FSMContext):
         await send_subscription(message.chat.id)
 
 async def send_captcha(message: Message, state: FSMContext):
-    num1 = random.randint(1, 10)
-    num2 = random.randint(1, 10)
+    num1 = random.randint(1, 100)
+    num2 = random.randint(1, 100)
     captcha_result = num1 + num2
 
     options = [captcha_result, captcha_result + random.randint(1, 5), captcha_result - random.randint(1, 5)]

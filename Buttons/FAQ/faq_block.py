@@ -18,15 +18,13 @@ async def faq(call: CallbackQuery):
 
     if user:
         if not user_ban:
-            faq_text = (
-                "❓ <b>Часті питання:</b>\n\n"
-                "1. <b>Чому довго немає оплати?</b>\n"
-                "Виплати проходять кожного дня з 10:00 до 23:00 в порядку черги!")
-            
+
+            faq = "❓<b>Часті питання:</b>\n\n" + config.FAQ.strip('"')
+
             back_button = InlineKeyboardButton(text='↩️ Меню', callback_data='menu')
             markup = InlineKeyboardMarkup(inline_keyboard=[[back_button]])
 
-            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=faq_text, parse_mode='html', reply_markup=markup)
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=faq, parse_mode='html', reply_markup=markup)
         else:
             await call.answer(config.BAN_MESSAGE, show_alert=True)
     else:
